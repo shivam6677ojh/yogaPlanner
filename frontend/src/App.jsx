@@ -10,12 +10,28 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import YogaVideos from "./pages/YogaVideos";
 import GlobalChatbot from "./components/GlobalChatbot";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './toast-custom.css';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Navbar />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          style={{ zIndex: 9999 }}
+        />
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />

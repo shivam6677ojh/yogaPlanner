@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
+import API from "../api/axios";
+import { toast } from 'react-toastify';
 
 // Icons
 const UserIcon = () => (
@@ -64,9 +66,17 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await API.post('/users/logout');
+      dispatch(logout());
+      toast.success('Logged out successfully. Namaste! 🙏');
+      navigate("/");
+    } catch (error) {
+      // Even if the API call fails, clear local state
+      dispatch(logout());
+      navigate("/");
+    }
   };
 
   const dropdownVariants = {

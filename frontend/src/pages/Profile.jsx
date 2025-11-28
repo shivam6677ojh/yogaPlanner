@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import API from '../api/axios'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 
 // SVG Icons
 const EditIcon = () => (
@@ -103,10 +104,17 @@ const Profile = () => {
       const updatedUser = { ...user, ...data.user }
       localStorage.setItem('user', JSON.stringify(updatedUser))
       
-      alert('Profile updated successfully!')
+      if (data.message && data.message.includes('verify')) {
+        toast.success('Profile updated! Please verify your new email address.', {
+          autoClose: 6000,
+        })
+      } else {
+        toast.success('✨ Profile updated successfully!')
+      }
       setEditMode(false)
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update profile')
+      const errorMessage = error.response?.data?.message || 'Failed to update profile'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -125,14 +133,7 @@ const Profile = () => {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-slate-300">Loading profile...</p>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner fullScreen={true} message="Loading profile..." />
   }
 
   return (

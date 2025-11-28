@@ -13,7 +13,9 @@ import {
   fetchStatsFail
 } from '../features/plan/planSlice'
 import API from '../api/axios'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 
 // SVG Icons
 const PlusIcon = () => (
@@ -185,10 +187,13 @@ const Dashboard = () => {
         dispatch(deletePlanStart())
         await API.delete(`/plans/${planId}`)
         dispatch(deletePlanSuccess(planId))
+        toast.success('Plan deleted successfully!')
         // Refresh stats after deletion
         fetchStats()
       } catch (err) {
-        dispatch(deletePlanFail(err.response?.data?.message || 'Failed to delete plan'))
+        const errorMessage = err.response?.data?.message || 'Failed to delete plan'
+        dispatch(deletePlanFail(errorMessage))
+        toast.error(errorMessage)
       }
     }
   }
@@ -199,10 +204,13 @@ const Dashboard = () => {
       await API.put(`/plans/complete/${planId}`)
       fetchPlans() // Refresh plans
       fetchStats() // Refresh stats after completion
-      alert("Congratulations! You've completed your yoga plan.")
+      toast.success("🎉 Congratulations! You've completed your yoga plan. Namaste! 🙏", {
+        autoClose: 5000,
+      })
     } catch (err) {
       console.error("Error marking plan as completed:", err)
-      alert(err.response?.data?.message || "Failed to mark plan as completed")
+      const errorMessage = err.response?.data?.message || "Failed to mark plan as completed"
+      toast.error(errorMessage)
     }
   }
 
@@ -212,14 +220,7 @@ const Dashboard = () => {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-slate-300">Loading your plans...</p>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner fullScreen={true} message="Loading your yoga plans..." />
   }
 
   return (

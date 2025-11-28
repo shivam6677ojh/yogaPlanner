@@ -5,6 +5,7 @@ import { createPlanStart, createPlanSuccess, createPlanFail, clearPlanError } fr
 import API from '../api/axios'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 
 // SVG Icons
 const PlusIcon = () => (
@@ -73,14 +74,24 @@ const CreatePlan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (!formData.planName.trim()) {
+      toast.error('Please enter a plan name')
+      return
+    }
+
     try {
       dispatch(createPlanStart())
       const { data } = await API.post('/plans', formData)
       dispatch(createPlanSuccess(data.plan))
-      alert('Plan created successfully! You will receive email and SMS notifications.')
-      navigate('/dashboard')
+      toast.success('🧘‍♀️ Plan created successfully! Email and SMS notifications sent.', {
+        autoClose: 5000,
+      })
+      setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
-      dispatch(createPlanFail(err.response?.data?.message || 'Failed to create plan'))
+      const errorMessage = err.response?.data?.message || 'Failed to create plan'
+      dispatch(createPlanFail(errorMessage))
+      toast.error(errorMessage)
     }
   }
 

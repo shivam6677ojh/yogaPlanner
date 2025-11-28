@@ -5,6 +5,7 @@ import { loginStart, loginSuccess, loginFail, clearError } from '../features/aut
 import API from '../api/axios'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 
 // Icons
 const EmailIcon = () => (
@@ -63,13 +64,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (!formData.email || !formData.password) {
+      toast.error('Please enter both email and password')
+      return
+    }
+
     try {
       dispatch(loginStart())
       const { data } = await API.post('/users/login', formData)
       dispatch(loginSuccess(data))
-      navigate('/dashboard')
+      toast.success(`Welcome back, ${data.user?.name || 'User'}! 🧘‍♀️`)
+      setTimeout(() => navigate('/dashboard'), 1000)
     } catch (err) {
-      dispatch(loginFail(err.response?.data?.message || 'Login failed'))
+      const errorMessage = err.response?.data?.message || 'Login failed'
+      dispatch(loginFail(errorMessage))
+      
+      // Handle specific error cases
+      if (err.response?.data?.requiresVerification) {
+        toast.error('Please verify your email before logging in. Check your inbox!', {
+          autoClose: 6000,
+        })
+      } else if (err.response?.status === 423) {
+        toast.error('Account locked due to multiple failed attempts. Please try again later.', {
+          autoClose: 6000,
+        })
+      } else {
+        toast.error(errorMessage)
+      }
     }
   }
 

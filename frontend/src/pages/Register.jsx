@@ -5,6 +5,7 @@ import { registerStart, registerSuccess, registerFail, clearError } from '../fea
 import API from '../api/axios'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'react-toastify'
 
 // Icons (same as before)
 const UserIcon = () => (
@@ -96,14 +97,46 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validation
+    if (!formData.name || !formData.email || !formData.password || !formData.phone) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    if (formData.password.length < 8) {
+      toast.error('Password must be at least 8 characters long')
+      return
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(formData.password)) {
+      toast.error('Password must contain uppercase, lowercase, number, and special character')
+      return
+    }
+
+    if (!/^\+?[1-9]\d{1,14}$/.test(formData.phone)) {
+      toast.error('Please provide a valid phone number with country code (e.g., +1234567890)')
+      return
+    }
+
     try {
       dispatch(registerStart())
-      await API.post('/users/register', formData)
+      const response = await API.post('/users/register', formData)
       dispatch(registerSuccess())
-      alert('Registration successful! Please login.')
-      navigate('/')
+      
+      if (response.data.requiresVerification) {
+        toast.success('Registration successful! Please check your email to verify your account.', {
+          autoClose: 6000,
+        })
+      } else {
+        toast.success('Registration successful! Please login.')
+      }
+      
+      setTimeout(() => navigate('/'), 2000)
     } catch (err) {
-      dispatch(registerFail(err.response?.data?.message || 'Registration failed'))
+      const errorMessage = err.response?.data?.message || 'Registration failed'
+      dispatch(registerFail(errorMessage))
+      toast.error(errorMessage)
     }
   }
 
