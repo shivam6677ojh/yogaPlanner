@@ -31,6 +31,12 @@ const VideoIcon = () => (
   </svg>
 );
 
+const YogaTypesIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+);
+
 const LogoutIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -72,7 +78,7 @@ const Navbar = () => {
       dispatch(logout());
       toast.success('Logged out successfully. Namaste! 🙏');
       navigate("/");
-    } catch (error) {
+    } catch {
       // Even if the API call fails, clear local state
       dispatch(logout());
       navigate("/");
@@ -102,7 +108,7 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center"
           >
-            <Link to="/" className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3 cursor-pointer">
               <div className={`p-2 rounded-xl ${
                 scrolled 
                   ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' 
@@ -126,7 +132,7 @@ const Navbar = () => {
                 <motion.div whileHover={{ y: -1 }} className="hidden md:block">
                   <Link
                     to="/dashboard"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                         : 'text-slate-300 hover:text-white hover:bg-white/10'
@@ -140,7 +146,7 @@ const Navbar = () => {
                 <motion.div whileHover={{ y: -1 }} className="hidden md:block">
                   <Link
                     to="/create-plan"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                         : 'text-slate-300 hover:text-white hover:bg-white/10'
@@ -153,8 +159,22 @@ const Navbar = () => {
 
                 <motion.div whileHover={{ y: -1 }} className="hidden md:block">
                   <Link
+                    to="/yoga-types"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
+                      scrolled
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <YogaTypesIcon />
+                    <span>Yoga Types</span>
+                  </Link>
+                </motion.div>
+
+                <motion.div whileHover={{ y: -1 }} className="hidden md:block">
+                  <Link
                     to="/yoga-videos"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                         : 'text-slate-300 hover:text-white hover:bg-white/10'
@@ -171,7 +191,7 @@ const Navbar = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all duration-300 ${
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'bg-slate-800/80 hover:bg-slate-700/80 text-white'
                         : 'bg-white/10 hover:bg-white/20 text-white'
@@ -219,7 +239,7 @@ const Navbar = () => {
                           {/* Dropdown Items */}
                           <Link
                             to="/profile"
-                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200"
+                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200 cursor-pointer"
                             onClick={() => setShowDropdown(false)}
                           >
                             <UserIcon />
@@ -228,7 +248,7 @@ const Navbar = () => {
                           
                           <Link
                             to="/dashboard"
-                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200"
+                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200 cursor-pointer"
                             onClick={() => setShowDropdown(false)}
                           >
                             <DashboardIcon />
@@ -237,7 +257,7 @@ const Navbar = () => {
                           
                           <Link
                             to="/create-plan"
-                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200"
+                            className="flex items-center space-x-3 px-4 py-3 text-sm text-slate-300 hover:bg-purple-600/20 hover:text-white transition-colors duration-200 cursor-pointer"
                             onClick={() => setShowDropdown(false)}
                           >
                             <PlusIcon />
@@ -251,7 +271,7 @@ const Navbar = () => {
                               setShowDropdown(false);
                               handleLogout();
                             }}
-                            className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors duration-200"
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors duration-200 cursor-pointer"
                           >
                             <LogoutIcon />
                             <span>Logout</span>
@@ -274,7 +294,7 @@ const Navbar = () => {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/"
-                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'text-slate-300 hover:text-white'
                         : 'text-slate-300 hover:text-white'
@@ -287,7 +307,7 @@ const Navbar = () => {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/register"
-                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer ${
                       scrolled
                         ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:shadow-lg hover:shadow-purple-500/25'
                         : 'bg-white text-purple-600 hover:bg-gray-100'

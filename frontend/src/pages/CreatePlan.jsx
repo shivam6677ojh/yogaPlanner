@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPlanStart, createPlanSuccess, createPlanFail, clearPlanError } from '../features/plan/planSlice'
 import API from '../api/axios'
@@ -42,9 +42,12 @@ const YogaIllustration = ({ className = "w-20 h-20" }) => (
 )
 
 const CreatePlan = () => {
+  const location = useLocation()
+  const preSelectedYogaType = location.state?.preSelectedYogaType || 'Hatha'
+  
   const [formData, setFormData] = useState({
     planName: '',
-    yogaType: 'Hatha',
+    yogaType: preSelectedYogaType,
     meditationTime: 10,
     durationWeeks: 4,
     dailySchedule: '',
@@ -58,6 +61,13 @@ const CreatePlan = () => {
   useEffect(() => {
     dispatch(clearPlanError())
   }, [dispatch])
+
+  useEffect(() => {
+    // Update yoga type if it comes from navigation state
+    if (location.state?.preSelectedYogaType) {
+      setFormData(prev => ({ ...prev, yogaType: location.state.preSelectedYogaType }))
+    }
+  }, [location.state])
 
   const yogaTypes = [
     'Hatha', 'Vinyasa', 'Ashtanga', 'Iyengar', 'Bikram', 
@@ -82,7 +92,14 @@ const CreatePlan = () => {
 
     try {
       dispatch(createPlanStart())
-      const { data } = await API.post('/plans', formData)
+      
+      // Convert dailySchedule string to array for backend validation
+      const payload = {
+        ...formData,
+        dailySchedule: formData.dailySchedule ? [formData.dailySchedule] : []
+      }
+
+      const { data } = await API.post('/plans', payload)
       dispatch(createPlanSuccess(data.plan))
       toast.success('🧘‍♀️ Plan created successfully! Email and SMS notifications sent.', {
         autoClose: 5000,
@@ -292,7 +309,7 @@ const CreatePlan = () => {
                   onClick={() => navigate('/dashboard')}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center justify-center px-6 py-3 border border-slate-600 text-sm font-medium rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-700/70 transition-all duration-300"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-slate-600 text-sm font-medium rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-700/70 transition-all duration-300 cursor-pointer"
                 >
                   <CancelIcon />
                   <span className="ml-2">Cancel</span>
@@ -302,7 +319,7 @@ const CreatePlan = () => {
                   disabled={loading}
                   whileHover={{ scale: loading ? 1 : 1.05 }}
                   whileTap={{ scale: loading ? 1 : 0.95 }}
-                  className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <div className="flex items-center">

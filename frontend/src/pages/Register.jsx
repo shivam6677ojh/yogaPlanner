@@ -121,16 +121,10 @@ const Register = () => {
 
     try {
       dispatch(registerStart())
-      const response = await API.post('/users/register', formData)
+      await API.post('/users/register', formData)
       dispatch(registerSuccess())
       
-      if (response.data.requiresVerification) {
-        toast.success('Registration successful! Please check your email to verify your account.', {
-          autoClose: 6000,
-        })
-      } else {
-        toast.success('Registration successful! Please login.')
-      }
+      toast.success('Registration successful! Please login.')
       
       setTimeout(() => navigate('/'), 2000)
     } catch (err) {
@@ -250,6 +244,7 @@ const Register = () => {
                       name="name"
                       type="text"
                       required
+                      autoComplete="name"
                       className="w-full pl-12 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-300"
                       placeholder="Enter your full name"
                       value={formData.name}
@@ -279,6 +274,7 @@ const Register = () => {
                       name="email"
                       type="email"
                       required
+                      autoComplete="email"
                       className="w-full pl-12 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-300"
                       placeholder="Enter your email"
                       value={formData.email}
@@ -308,6 +304,7 @@ const Register = () => {
                       name="password"
                       type="password"
                       required
+                      autoComplete="new-password"
                       className="w-full pl-12 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all duration-300"
                       placeholder="Create a password"
                       value={formData.password}
@@ -491,7 +488,7 @@ const Register = () => {
                 Already have an account?{' '}
                 <Link
                   to="/"
-                  className="font-semibold text-purple-400 hover:text-purple-300 transition-colors duration-300"
+                  className="font-semibold text-purple-400 hover:text-purple-300 transition-colors duration-300 cursor-pointer"
                 >
                   Sign in here
                 </Link>

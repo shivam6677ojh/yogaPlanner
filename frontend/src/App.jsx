@@ -9,6 +9,7 @@ import CreatePlan from "./pages/CreatePlan";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import YogaVideos from "./pages/YogaVideos";
+import YogaTypes from "./pages/YogaTypes";
 import GlobalChatbot from "./components/GlobalChatbot";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -60,6 +61,14 @@ function App() {
             }
           />
 
+          <Route
+            path="/yoga-types"
+            element={
+              <ProtectedRoute>
+                <YogaTypes />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/yoga-videos"
             element={

@@ -363,7 +363,7 @@ const Dashboard = () => {
         >
           <Link
             to="/create-plan"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer"
           >
             <PlusIcon />
             <span className="ml-2">Create New Plan</span>
@@ -391,7 +391,7 @@ const Dashboard = () => {
             </p>
             <Link
               to="/create-plan"
-              className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+              className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer"
             >
               <PlusIcon />
               <span className="ml-2">Create Your First Plan</span>
@@ -480,7 +480,7 @@ const Dashboard = () => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleMarkAsCompleted(plan._id)}
-                            className="inline-flex items-center px-4 py-2 border border-green-500/30 text-sm font-medium rounded-lg text-green-400 bg-green-500/10 hover:bg-green-500/20 transition-all duration-300"
+                            className="inline-flex items-center px-4 py-2 border border-green-500/30 text-sm font-medium rounded-lg text-green-400 bg-green-500/10 hover:bg-green-500/20 transition-all duration-300 cursor-pointer"
                           >
                             <CheckIcon />
                             <span className="ml-2">Mark Completed</span>
@@ -500,7 +500,7 @@ const Dashboard = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDeletePlan(plan._id)}
-                          className="inline-flex items-center px-4 py-2 border border-red-500/30 text-sm font-medium rounded-lg text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-all duration-300"
+                          className="inline-flex items-center px-4 py-2 border border-red-500/30 text-sm font-medium rounded-lg text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-all duration-300 cursor-pointer"
                         >
                           <TrashIcon />
                           <span className="ml-2">Delete</span>

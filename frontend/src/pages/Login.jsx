@@ -283,7 +283,7 @@ const Login = () => {
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-semibold text-purple-400 hover:text-purple-300 transition-colors duration-300"
+                  className="font-semibold text-purple-400 hover:text-purple-300 transition-colors duration-300 cursor-pointer"
                 >
                   Sign up now
                 </Link>

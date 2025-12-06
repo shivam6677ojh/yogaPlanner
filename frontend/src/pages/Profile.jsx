@@ -183,7 +183,7 @@ const Profile = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setEditMode(!editMode)}
-                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${
+                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-300 cursor-pointer ${
                   editMode 
                     ? 'bg-slate-600 text-white hover:bg-slate-700' 
                     : 'bg-linear-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700'
@@ -405,7 +405,7 @@ const Profile = () => {
                         onClick={handleCancel}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-6 py-3 border border-slate-600 text-sm font-medium rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-700/70 transition-all duration-300 flex items-center"
+                        className="px-6 py-3 border border-slate-600 text-sm font-medium rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-700/70 transition-all duration-300 flex items-center cursor-pointer"
                       >
                         <CancelIcon />
                         <span className="ml-2">Cancel</span>
@@ -415,7 +415,7 @@ const Profile = () => {
                         disabled={loading}
                         whileHover={{ scale: loading ? 1 : 1.05 }}
                         whileTap={{ scale: loading ? 1 : 0.95 }}
-                        className="px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                        className="px-6 py-3 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center cursor-pointer"
                       >
                         <SaveIcon />
                         <span className="ml-2">{loading ? 'Saving...' : 'Save Changes'}</span>

@@ -42,31 +42,14 @@ export const registerUser = async (req, res) => {
       phone,
       fitnessLevel,
       goal,
-      isVerified: false
+      isVerified: true // Auto-verify since email verification is disabled
     });
 
-    // Generate verification token
-    const verificationToken = user.generateVerificationToken();
-    await user.save();
-
-    // Create verification URL
-    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${verificationToken}`;
-
-    // Send verification email
-    try {
-      await sendVerificationEmail(user.email, user.name, verificationUrl);
-      res.status(201).json({ 
-        message: "Registration successful! Please check your email to verify your account.",
-        requiresVerification: true
-      });
-    } catch (emailError) {
-      // If email fails, delete the user and return error
-      await User.findByIdAndDelete(user._id);
-      console.error("Email sending failed:", emailError);
-      return res.status(500).json({ 
-        message: "Registration failed. Could not send verification email. Please try again." 
-      });
-    }
+    // Send success response immediately
+    res.status(201).json({ 
+      message: "Registration successful! Please login.",
+      requiresVerification: false
+    });
 
   } catch (error) {
     console.error("Registration error:", error);
@@ -182,13 +165,15 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Check if email is verified
+    // Email verification check removed
+    /*
     if (!user.isVerified) {
       return res.status(403).json({ 
         message: "Please verify your email before logging in. Check your inbox for the verification link.",
         requiresVerification: true
       });
     }
+    */
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -376,14 +361,14 @@ export const updateProfile = async (req, res) => {
         });
       }
       
-      // If email is changed, require reverification
+      // If email is changed, update it (verification disabled)
       user.email = email;
-      user.isVerified = false;
+      // user.isVerified = false; // Disabled verification
       
-      const verificationToken = user.generateVerificationToken();
-      const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${verificationToken}`;
+      // const verificationToken = user.generateVerificationToken();
+      // const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email/${verificationToken}`;
       
-      await sendVerificationEmail(email, name || user.name, verificationUrl);
+      // await sendVerificationEmail(email, name || user.name, verificationUrl);
     }
 
     // Check if new phone is already taken by another user

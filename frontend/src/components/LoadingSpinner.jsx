@@ -20,7 +20,7 @@ const LoadingSpinner = ({ size = 'medium', fullScreen = false, message = 'Loadin
         <motion.div
           className={`${sizeClasses[size].container} relative`}
           animate={{ rotate: 360 }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
         >
           {[...Array(8)].map((_, i) => (
             <motion.div
