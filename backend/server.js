@@ -19,10 +19,18 @@ app.use(helmet()); // Set security headers
 // CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", process.env.FRONTEND_URL].filter(Boolean),
+    origin: [
+      "http://localhost:5173", 
+      "http://localhost:5174", 
+      "https://yoga-planner-app.vercel.app",
+      "https://yoga-planner-app-git-main.vercel.app",
+      "https://yoga-planner-app-*.vercel.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie']
   })
 );
 
