@@ -33,7 +33,10 @@ export const registerUser = async (req, res) => {
     // Hash password with strong algorithm
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user (unverified)
+    // Check if email verification should be skipped (for development/testing)
+    const skipVerification = process.env.SKIP_EMAIL_VERIFICATION === 'true';
+
+    // Create user (unverified unless skipping verification)
     const user = await User.create({
       name,
       email,
@@ -42,31 +45,47 @@ export const registerUser = async (req, res) => {
       phone,
       fitnessLevel,
       goal,
-      isVerified: false // User must verify OTP
+      isVerified: skipVerification // Skip verification if configured
     });
+
+    // If skipping verification, return early
+    if (skipVerification) {
+      return res.status(201).json({ 
+        message: "Registration successful! You can now login.",
+        requiresVerification: false
+      });
+    }
 
     // Generate OTP
     const otp = user.generateOTP();
     await user.save();
 
     // Send OTP via email
+    let emailSent = false;
     try {
       await sendEmail({
         to: email,
         subject: 'Verify Your Email - Yoga Planner',
         message: `Hello ${name},\n\nThank you for registering with Yoga Planner!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't register for an account, please ignore this email.\n\nBest regards,\nYoga Planner Team`
       });
+      emailSent = true;
     } catch (emailError) {
-      // If email fails, delete the user
-      await User.findByIdAndDelete(user._id);
-      return res.status(500).json({ 
-        message: "Failed to send verification email. Please try again." 
-      });
+      // Log OTP to console if email fails (for development/testing)
+      console.log(`\n========================================`);
+      console.log(`📧 Email failed to send to: ${email}`);
+      console.log(`🔐 OTP Code: ${otp}`);
+      console.log(`⏰ Valid for 10 minutes`);
+      console.log(`========================================\n`);
+      
+      // Don't delete user - allow registration to complete
+      // In production, you might want to auto-verify or notify admin
     }
 
-    // Send success response immediately
+    // Send success response
     res.status(201).json({ 
-      message: "Registration successful! Please check your email for the OTP verification code.",
+      message: emailSent 
+        ? "Registration successful! Please check your email for the OTP verification code."
+        : "Registration successful! OTP has been generated. Please contact support for your verification code.",
       requiresVerification: true,
       email: email
     });
