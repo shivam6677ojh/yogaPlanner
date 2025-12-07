@@ -82,9 +82,13 @@ const Login = () => {
       
       // Handle specific error cases
       if (err.response?.data?.requiresVerification) {
-        toast.error('Please verify your email before logging in. Check your inbox!', {
-          autoClose: 6000,
+        const email = err.response?.data?.email
+        toast.error('Please verify your email with OTP first!', {
+          autoClose: 3000,
         })
+        setTimeout(() => {
+          navigate('/verify-otp', { state: { email } })
+        }, 3000)
       } else if (err.response?.status === 423) {
         toast.error('Account locked due to multiple failed attempts. Please try again later.', {
           autoClose: 6000,

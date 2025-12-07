@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema({
   verificationToken: String,
   verificationTokenExpire: Date,
 
+  // OTP verification fields
+  otp: String,
+  otpExpire: Date,
+  otpAttempts: {
+    type: Number,
+    default: 0
+  },
+
   // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpire: Date,
@@ -119,6 +127,38 @@ userSchema.methods.generateVerificationToken = function() {
     .digest('hex');
   this.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
   return token;
+};
+
+// Generate OTP for email verification
+userSchema.methods.generateOTP = function() {
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  this.otp = otp;
+  this.otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.otpAttempts = 0;
+  return otp;
+};
+
+// Verify OTP
+userSchema.methods.verifyOTP = function(enteredOTP) {
+  if (!this.otp || !this.otpExpire) {
+    return { success: false, message: 'No OTP found. Please request a new one.' };
+  }
+  
+  if (this.otpExpire < Date.now()) {
+    return { success: false, message: 'OTP has expired. Please request a new one.' };
+  }
+  
+  if (this.otpAttempts >= 3) {
+    return { success: false, message: 'Too many failed attempts. Please request a new OTP.' };
+  }
+  
+  if (this.otp === enteredOTP) {
+    return { success: true, message: 'OTP verified successfully' };
+  }
+  
+  this.otpAttempts += 1;
+  return { success: false, message: `Invalid OTP. ${3 - this.otpAttempts} attempts remaining.` };
 };
 
 // Generate password reset token

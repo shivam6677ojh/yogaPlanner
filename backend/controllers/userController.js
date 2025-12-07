@@ -33,7 +33,7 @@ export const registerUser = async (req, res) => {
     // Hash password with strong algorithm
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create user
+    // Create user (unverified)
     const user = await User.create({
       name,
       email,
@@ -42,13 +42,33 @@ export const registerUser = async (req, res) => {
       phone,
       fitnessLevel,
       goal,
-      isVerified: true // Auto-verify since email verification is disabled
+      isVerified: false // User must verify OTP
     });
+
+    // Generate OTP
+    const otp = user.generateOTP();
+    await user.save();
+
+    // Send OTP via email
+    try {
+      await sendEmail({
+        to: email,
+        subject: 'Verify Your Email - Yoga Planner',
+        message: `Hello ${name},\n\nThank you for registering with Yoga Planner!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't register for an account, please ignore this email.\n\nBest regards,\nYoga Planner Team`
+      });
+    } catch (emailError) {
+      // If email fails, delete the user
+      await User.findByIdAndDelete(user._id);
+      return res.status(500).json({ 
+        message: "Failed to send verification email. Please try again." 
+      });
+    }
 
     // Send success response immediately
     res.status(201).json({ 
-      message: "Registration successful! Please login.",
-      requiresVerification: false
+      message: "Registration successful! Please check your email for the OTP verification code.",
+      requiresVerification: true,
+      email: email
     });
 
   } catch (error) {
@@ -165,15 +185,14 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Email verification check removed
-    /*
+    // Check if email is verified
     if (!user.isVerified) {
       return res.status(403).json({ 
-        message: "Please verify your email before logging in. Check your inbox for the verification link.",
-        requiresVerification: true
+        message: "Please verify your email with OTP before logging in. Check your inbox for the verification code.",
+        requiresVerification: true,
+        email: user.email
       });
     }
-    */
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -238,6 +257,96 @@ export const logoutUser = (req, res) => {
     expires: new Date(0)
   });
   res.json({ message: "Logged out successfully" });
+};
+
+// Verify OTP
+export const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    // Verify OTP
+    const verification = user.verifyOTP(otp);
+
+    if (!verification.success) {
+      await user.save(); // Save incremented attempts
+      return res.status(400).json({ message: verification.message });
+    }
+
+    // Mark user as verified and clear OTP
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    user.otpAttempts = 0;
+    await user.save();
+
+    res.json({ 
+      message: "Email verified successfully! You can now login.",
+      success: true 
+    });
+
+  } catch (error) {
+    res.status(500).json({ 
+      message: "OTP verification failed", 
+      error: error.message 
+    });
+  }
+};
+
+// Resend OTP
+export const resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Email is already verified" });
+    }
+
+    // Generate new OTP
+    const otp = user.generateOTP();
+    await user.save();
+
+    // Send OTP via email
+    await sendEmail({
+      to: email,
+      subject: 'Verify Your Email - Yoga Planner',
+      message: `Hello ${user.name},\n\nYour new verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\nYoga Planner Team`
+    });
+
+    res.json({ 
+      message: "OTP has been resent to your email",
+      success: true 
+    });
+
+  } catch (error) {
+    res.status(500).json({ 
+      message: "Failed to resend OTP", 
+      error: error.message 
+    });
+  }
 };
 
 // Forgot password - send reset link

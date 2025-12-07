@@ -104,6 +104,20 @@ const Register = () => {
       return
     }
 
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+
+    // Check for common fake email patterns
+    const fakeEmailPatterns = /^(test|fake|dummy|sample|example|temp|trash|disposable).*@/i
+    if (fakeEmailPatterns.test(formData.email)) {
+      toast.error('Please use a real email address')
+      return
+    }
+
     if (formData.password.length < 8) {
       toast.error('Password must be at least 8 characters long')
       return
@@ -119,14 +133,39 @@ const Register = () => {
       return
     }
 
+    if (formData.age && formData.age !== '') {
+      const ageNum = parseInt(formData.age)
+      if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
+        toast.error('Age must be between 13 and 120 years')
+        return
+      }
+    }
+
     try {
       dispatch(registerStart())
-      await API.post('/users/register', formData)
+      
+      // Clean up form data - remove empty age field
+      const cleanedData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        fitnessLevel: formData.fitnessLevel,
+        goal: formData.goal
+      }
+      
+      // Only add age if it has a value
+      if (formData.age && formData.age !== '') {
+        cleanedData.age = parseInt(formData.age)
+      }
+      
+      const { data } = await API.post('/users/register', cleanedData)
       dispatch(registerSuccess())
       
-      toast.success('Registration successful! Please login.')
+      toast.success('Registration successful! Please check your email for OTP.')
       
-      setTimeout(() => navigate('/'), 2000)
+      // Navigate to OTP verification page
+      setTimeout(() => navigate('/verify-otp', { state: { email: cleanedData.email } }), 1500)
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Registration failed'
       dispatch(registerFail(errorMessage))
