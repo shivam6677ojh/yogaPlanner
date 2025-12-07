@@ -14,6 +14,13 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password, age, phone, fitnessLevel, goal } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({ 
+        message: "Please provide all required fields: name, email, password, and phone" 
+      });
+    }
+
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -48,11 +55,36 @@ export const registerUser = async (req, res) => {
       isVerified: skipVerification // Skip verification if configured
     });
 
-    // If skipping verification, return early
+    // If skipping verification, generate token and return user data immediately
     if (skipVerification) {
+      console.log('⚡ Skipping email verification - instant registration');
+      const token = generateToken(user._id);
+      
+      // Set cookie
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+      
+      res.cookie('token', token, cookieOptions);
+      
       return res.status(201).json({ 
         message: "Registration successful! You can now login.",
-        requiresVerification: false
+        requiresVerification: false,
+        skipVerification: true,
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          age: user.age,
+          fitnessLevel: user.fitnessLevel,
+          goal: user.goal,
+          isVerified: true
+        }
       });
     }
 
@@ -62,6 +94,8 @@ export const registerUser = async (req, res) => {
 
     // Send OTP via email
     let emailSent = false;
+    console.log(`📧 Attempting to send OTP to: ${email}`);
+    console.log(`🔐 Generated OTP: ${otp}`);
     try {
       await sendEmail(
         email,
@@ -69,6 +103,7 @@ export const registerUser = async (req, res) => {
         `Hello ${name},\n\nThank you for registering with Yoga Planner!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't register for an account, please ignore this email.\n\nBest regards,\nYoga Planner Team`
       );
       emailSent = true;
+      console.log(`✅ Email sent successfully!`);
     } catch (emailError) {
       // Log OTP to console if email fails (for development/testing)
       console.log(`\n========================================`);
@@ -318,8 +353,18 @@ export const verifyOTP = async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Registration error:', error);
+    
+    // Handle mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: messages.join(', ')
+      });
+    }
+    
     res.status(500).json({ 
-      message: "OTP verification failed", 
+      message: "Registration failed", 
       error: error.message 
     });
   }

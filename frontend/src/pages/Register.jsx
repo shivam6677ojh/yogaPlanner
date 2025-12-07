@@ -128,8 +128,8 @@ const Register = () => {
       return
     }
 
-    if (!/^\+?[1-9]\d{1,14}$/.test(formData.phone)) {
-      toast.error('Please provide a valid phone number with country code (e.g., +1234567890)')
+    if (!/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/.test(formData.phone)) {
+      toast.error('Please provide a valid phone number (e.g., +1234567890 or 1234567890)')
       return
     }
 
@@ -160,13 +160,33 @@ const Register = () => {
       }
       
       const { data } = await API.post('/users/register', cleanedData)
-      dispatch(registerSuccess())
       
-      toast.success('Registration successful! Please check your email for OTP.')
-      
-      // Navigate to OTP verification page
-      setTimeout(() => navigate('/verify-otp', { state: { email: cleanedData.email } }), 1500)
+      // Check if email verification was skipped
+      if (data.skipVerification) {
+        // Save token and user data
+        if (data.token) {
+          localStorage.setItem('token', data.token)
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user))
+        }
+        
+        dispatch(registerSuccess())
+        toast.success('Registration successful! Redirecting to dashboard...')
+        
+        // Navigate to dashboard directly
+        setTimeout(() => navigate('/dashboard'), 1000)
+      } else {
+        // Regular flow - need OTP verification
+        dispatch(registerSuccess())
+        toast.success('Registration successful! Please check your email for OTP.')
+        
+        // Navigate to OTP verification page
+        setTimeout(() => navigate('/verify-otp', { state: { email: cleanedData.email } }), 1500)
+      }
     } catch (err) {
+      console.error('Registration error:', err)
+      console.error('Error response:', err.response?.data)
       const errorMessage = err.response?.data?.message || 'Registration failed'
       dispatch(registerFail(errorMessage))
       toast.error(errorMessage)

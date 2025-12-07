@@ -28,7 +28,13 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number']
+    validate: {
+      validator: function(v) {
+        // Allow formats: +1234567890, 1234567890, +91-1234567890, etc.
+        return /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/.test(v);
+      },
+      message: 'Please provide a valid phone number'
+    }
   },
 
   age: {

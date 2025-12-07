@@ -2,15 +2,26 @@ import nodemailer from "nodemailer";
 
 export const sendEmail = async (to, subject, message) => {
   try {
+    console.log('📧 Setting up email transporter...');
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // Use TLS
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
-    await transporter.sendMail({
+    console.log('📧 Verifying transporter...');
+    await transporter.verify();
+    console.log('✅ Transporter verified successfully');
+
+    console.log(`📧 Sending email to: ${to}`);
+    const info = await transporter.sendMail({
       from: `"Yoga Planner" <${process.env.EMAIL_USER}>`,
       to,
       subject,
@@ -18,9 +29,12 @@ export const sendEmail = async (to, subject, message) => {
       html: message.replace(/\n/g, '<br>')
     });
 
-    // console.log("✅ Email sent successfully to:", to);
+    console.log("✅ Email sent successfully to:", to);
+    console.log("Message ID:", info.messageId);
+    return info;
   } catch (error) {
-    // console.error("❌ Error sending email:", error.message);
+    console.error("❌ Error sending email:", error.message);
+    console.error("Full error:", error);
     throw new Error("Failed to send email");
   }
 };
