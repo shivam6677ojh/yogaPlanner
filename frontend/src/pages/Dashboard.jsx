@@ -208,7 +208,7 @@ const Dashboard = () => {
         autoClose: 5000,
       })
     } catch (err) {
-      console.error("Error marking plan as completed:", err)
+      // console.error("Error marking plan as completed:", err)
       const errorMessage = err.response?.data?.message || "Failed to mark plan as completed"
       toast.error(errorMessage)
     }
@@ -408,7 +408,7 @@ const Dashboard = () => {
               {plans.map((plan, index) => {
                 // Skip invalid plans
                 if (!plan || !plan._id) {
-                  console.warn('Invalid plan object:', plan)
+                  // console.warn('Invalid plan object:', plan)
                   return null
                 }
 

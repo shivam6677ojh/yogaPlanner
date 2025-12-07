@@ -18,9 +18,9 @@ export const sendEmail = async (to, subject, message) => {
       html: message.replace(/\n/g, '<br>')
     });
 
-    console.log("✅ Email sent successfully to:", to);
+    // console.log("✅ Email sent successfully to:", to);
   } catch (error) {
-    console.error("❌ Error sending email:", error.message);
+    // console.error("❌ Error sending email:", error.message);
     throw new Error("Failed to send email");
   }
 };

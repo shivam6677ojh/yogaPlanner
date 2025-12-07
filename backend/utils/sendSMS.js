@@ -10,8 +10,8 @@ export const sendSMS = async (to, body) => {
       to, // recipient’s number (must be verified on trial)
     });
 
-    console.log("✅ SMS sent successfully to:", to, "| SID:", message.sid);
+    // console.log("✅ SMS sent successfully to:", to, "| SID:", message.sid);
   } catch (error) {
-    console.error("❌ SMS sending error:", error.message);
+    // console.error("❌ SMS sending error:", error.message);
   }
 };

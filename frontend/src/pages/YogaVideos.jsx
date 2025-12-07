@@ -173,7 +173,7 @@ const YogaVideos = () => {
       const data = await response.json()
       setYoutubeResults(data.items || [])
     } catch (error) {
-      console.error('Error fetching YouTube videos:', error)
+      // console.error('Error fetching YouTube videos:', error)
       setYoutubeResults([])
     } finally {
       setYoutubeLoading(false)
