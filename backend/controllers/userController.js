@@ -63,11 +63,11 @@ export const registerUser = async (req, res) => {
     // Send OTP via email
     let emailSent = false;
     try {
-      await sendEmail({
-        to: email,
-        subject: 'Verify Your Email - Yoga Planner',
-        message: `Hello ${name},\n\nThank you for registering with Yoga Planner!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't register for an account, please ignore this email.\n\nBest regards,\nYoga Planner Team`
-      });
+      await sendEmail(
+        email,
+        'Verify Your Email - Yoga Planner',
+        `Hello ${name},\n\nThank you for registering with Yoga Planner!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't register for an account, please ignore this email.\n\nBest regards,\nYoga Planner Team`
+      );
       emailSent = true;
     } catch (emailError) {
       // Log OTP to console if email fails (for development/testing)
@@ -349,11 +349,11 @@ export const resendOTP = async (req, res) => {
     await user.save();
 
     // Send OTP via email
-    await sendEmail({
-      to: email,
-      subject: 'Verify Your Email - Yoga Planner',
-      message: `Hello ${user.name},\n\nYour new verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\nYoga Planner Team`
-    });
+    await sendEmail(
+      email,
+      'Verify Your Email - Yoga Planner',
+      `Hello ${user.name},\n\nYour new verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\nYoga Planner Team`
+    );
 
     res.json({ 
       message: "OTP has been resent to your email",
