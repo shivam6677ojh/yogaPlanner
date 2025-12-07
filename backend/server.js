@@ -21,10 +21,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", 
-      "http://localhost:5174", 
-      "https://yoga-planner-app.vercel.app",
-      "https://yoga-planner-app-git-main.vercel.app",
-      "https://yoga-planner-app-*.vercel.app",
+      "http://localhost:5174",
+      "https://yoga-planner-ruddy.vercel.app",
       process.env.FRONTEND_URL
     ].filter(Boolean),
     credentials: true,
