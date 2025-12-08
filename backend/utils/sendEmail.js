@@ -4,12 +4,12 @@ export const sendEmail = async (to, subject, message) => {
   try {
     console.log('📧 Setting up email transporter...');
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: "smtp-relay.brevo.com",
       port: 587,
       secure: false, // Use TLS
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
       tls: {
         rejectUnauthorized: false
@@ -22,7 +22,7 @@ export const sendEmail = async (to, subject, message) => {
 
     console.log(`📧 Sending email to: ${to}`);
     const info = await transporter.sendMail({
-      from: `"Yoga Planner" <${process.env.EMAIL_USER}>`,
+      from: `"Yoga Planner" <${process.env.SMTP_SENDER}>`,
       to,
       subject,
       text: message,

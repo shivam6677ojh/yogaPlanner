@@ -506,7 +506,7 @@ const Dashboard = () => {
                           transition={{ type: "spring", duration: 0.5 }}
                           className="relative"
                         >
-                          <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                          <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 mt-2.5 mr-23 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
                             <span>✨</span>
                             <span>Completed!</span>
                             <span>🎉</span>
