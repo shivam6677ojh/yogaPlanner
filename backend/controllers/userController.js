@@ -29,16 +29,8 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Check if phone already exists
-    const phoneExists = await User.findOne({ phone });
-    if (phoneExists) {
-      return res.status(400).json({ 
-        message: "User with this phone number already exists" 
-      });
-    }
-
-    // Hash password with strong algorithm
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // Hash password (reduced rounds for speed)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user (verified by default - no OTP needed)
     const user = await User.create({

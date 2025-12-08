@@ -27,11 +27,12 @@ const userSchema = new mongoose.Schema({
   
   phone: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: function(v) {
+        if (!v) return true; // Allow empty
         // Allow formats: +1234567890, 1234567890, +91-1234567890, etc.
-        return /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/.test(v);
+        return /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/.test(v);
       },
       message: 'Please provide a valid phone number'
     }
@@ -75,6 +76,9 @@ const userSchema = new mongoose.Schema({
   lastLogin: Date,
 
 }, { timestamps: true });
+
+// Create indexes for faster queries
+userSchema.index({ email: 1 });
 
 // Virtual for checking if account is locked
 userSchema.virtual('isLocked').get(function() {

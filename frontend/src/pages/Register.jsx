@@ -99,7 +99,7 @@ const Register = () => {
     e.preventDefault()
     
     // Validation
-    if (!formData.name || !formData.email || !formData.password || !formData.phone) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast.error('Please fill in all required fields')
       return
     }
@@ -112,17 +112,7 @@ const Register = () => {
     }
 
     if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters long')
-      return
-    }
-
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(formData.password)) {
-      toast.error('Password must contain uppercase, lowercase, number, and special character')
-      return
-    }
-
-    if (!/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/.test(formData.phone)) {
-      toast.error('Please provide a valid phone number (e.g., +1234567890 or 1234567890)')
+      toast.error('Password must be at least 8 characters')
       return
     }
 
