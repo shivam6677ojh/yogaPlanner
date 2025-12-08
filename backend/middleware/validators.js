@@ -25,11 +25,21 @@ export const validateRegister = [
     .trim()
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Must be a valid email address')
+    .custom((value) => {
+      if (!/@gmail\.com$|@[a-zA-Z0-9.-]+\.in$/i.test(value)) {
+        throw new Error('Only @gmail.com and @.in email domains are allowed');
+      }
+      return true;
+    })
     .normalizeEmail(),
   
   body('password')
     .notEmpty().withMessage('Password is required')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/(?=.*[a-z])/).withMessage('Password must contain at least one lowercase letter')
+    .matches(/(?=.*[A-Z])/).withMessage('Password must contain at least one uppercase letter')
+    .matches(/(?=.*\d)/).withMessage('Password must contain at least one number')
+    .matches(/(?=.*[@$!%*?&#])/).withMessage('Password must contain at least one special character (@$!%*?&#)'),
   
   body('phone')
     .optional()
@@ -58,6 +68,12 @@ export const validateLogin = [
     .trim()
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Must be a valid email address')
+    .custom((value) => {
+      if (!/@gmail\.com$|@[a-zA-Z0-9.-]+\.in$/i.test(value)) {
+        throw new Error('Only @gmail.com and @.in email domains are allowed');
+      }
+      return true;
+    })
     .normalizeEmail(),
   
   body('password')

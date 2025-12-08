@@ -111,8 +111,36 @@ const Register = () => {
       return
     }
 
+    // Restrict to @gmail.com and @.in domains only
+    const allowedDomains = /@gmail\.com$|@[a-zA-Z0-9.-]+\.in$/i
+    if (!allowedDomains.test(formData.email)) {
+      toast.error('Only @gmail.com and @.in email domains are allowed')
+      return
+    }
+
     if (formData.password.length < 8) {
       toast.error('Password must be at least 8 characters')
+      return
+    }
+
+    // Password validation: must contain uppercase, lowercase, number, and special character
+    if (!/(?=.*[a-z])/.test(formData.password)) {
+      toast.error('Password must contain at least one lowercase letter')
+      return
+    }
+
+    if (!/(?=.*[A-Z])/.test(formData.password)) {
+      toast.error('Password must contain at least one uppercase letter')
+      return
+    }
+
+    if (!/(?=.*\d)/.test(formData.password)) {
+      toast.error('Password must contain at least one number')
+      return
+    }
+
+    if (!/(?=.*[@$!%*?&#])/.test(formData.password)) {
+      toast.error('Password must contain at least one special character (@$!%*?&#)')
       return
     }
 
@@ -145,10 +173,10 @@ const Register = () => {
       await API.post('/users/register', cleanedData)
       
       dispatch(registerSuccess())
-      toast.success('Registration successful! Please login with your credentials.')
+      toast.success('Registration successful! Redirecting to login...')
       
-      // Navigate to login page
-      setTimeout(() => navigate('/login'), 1500)
+      // Navigate to login page immediately
+      setTimeout(() => navigate('/login'), 1000)
     } catch (err) {
       console.error('Registration error:', err)
       console.error('Error response:', err.response?.data)
