@@ -1,6 +1,7 @@
 import { body, validationResult } from 'express-validator';
 
 // Middleware to check validation results
+// Updated: Simplified validation for faster registration
 export const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
