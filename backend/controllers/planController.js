@@ -33,6 +33,7 @@ export const createPlan = async (req, res) => {
 
     // Send notifications asynchronously (non-blocking)
     // ✅ Send Email in background
+    console.log('📧 Attempting to send plan creation email to:', req.user.email);
     if (req.user.email) {
       sendEmail(
         req.user.email,
@@ -40,9 +41,16 @@ export const createPlan = async (req, res) => {
         `Hi ${req.user.name || "User"},\n\nYour yoga plan "${
           plan.planName
         }" has been created successfully!\nKeep practicing and stay consistent.\n\n- Yoga Planner App`
-      ).catch(emailError => {
-        console.error("Failed to send plan creation email:", emailError);
+      )
+      .then(() => {
+        console.log('✅ Plan creation email sent successfully to:', req.user.email);
+      })
+      .catch(emailError => {
+        console.error("❌ Failed to send plan creation email:", emailError.message);
+        console.error("❌ Email error details:", emailError);
       });
+    } else {
+      console.log('⚠️ No email address found for user:', req.user.id);
     }
 
     // ✅ Send SMS in background
@@ -131,6 +139,7 @@ export const markPlanCompleted = async (req, res) => {
     res.json({ message: "Plan marked as completed", plan });
 
     // Send completion email in background (non-blocking)
+    console.log('📧 Attempting to send completion email to:', req.user.email);
     if (req.user.email) {
       sendEmail(
         req.user.email,
@@ -138,9 +147,16 @@ export const markPlanCompleted = async (req, res) => {
         `Hi ${req.user.name || "User"},\n\nCongratulations! You have completed your yoga plan "${
           plan.planName
         }"!\n\nKeep up the great work and stay consistent.\n\n- Yoga Planner App`
-      ).catch(emailError => {
-        console.error("Failed to send completion email:", emailError);
+      )
+      .then(() => {
+        console.log('✅ Completion email sent successfully to:', req.user.email);
+      })
+      .catch(emailError => {
+        console.error("❌ Failed to send completion email:", emailError.message);
+        console.error("❌ Email error details:", emailError);
       });
+    } else {
+      console.log('⚠️ No email address found for user:', req.user.id);
     }
   } catch (err) {
     console.error("❌ Error marking plan as completed:", err);

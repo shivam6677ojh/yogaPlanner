@@ -3,6 +3,13 @@ import nodemailer from "nodemailer";
 export const sendEmail = async (to, subject, message) => {
   try {
     console.log('📧 Setting up email transporter...');
+    console.log('📧 SMTP Config:', {
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      user: process.env.SMTP_USER,
+      sender: process.env.SMTP_SENDER
+    });
+
     const transporter = nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
@@ -16,11 +23,7 @@ export const sendEmail = async (to, subject, message) => {
       }
     });
 
-    console.log('📧 Verifying transporter...');
-    await transporter.verify();
-    console.log('✅ Transporter verified successfully');
-
-    console.log(`📧 Sending email to: ${to}`);
+    console.log(`📧 Sending email to: ${to} with subject: ${subject}`);
     const info = await transporter.sendMail({
       from: `"Yoga Planner" <${process.env.SMTP_SENDER}>`,
       to,
@@ -30,12 +33,14 @@ export const sendEmail = async (to, subject, message) => {
     });
 
     console.log("✅ Email sent successfully to:", to);
-    console.log("Message ID:", info.messageId);
+    console.log("📧 Message ID:", info.messageId);
     return info;
   } catch (error) {
-    console.error("❌ Error sending email:", error.message);
-    console.error("Full error:", error);
-    throw new Error("Failed to send email");
+    console.error("❌ Error sending email to:", to);
+    console.error("❌ Error message:", error.message);
+    console.error("❌ Error code:", error.code);
+    console.error("❌ Full error:", error);
+    throw error;
   }
 };
 
