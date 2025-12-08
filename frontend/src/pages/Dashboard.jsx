@@ -8,6 +8,9 @@ import {
   deletePlanStart, 
   deletePlanSuccess, 
   deletePlanFail,
+  updatePlanStart,
+  updatePlanSuccess,
+  updatePlanFail,
   fetchStatsStart,
   fetchStatsSuccess,
   fetchStatsFail
@@ -201,17 +204,73 @@ const Dashboard = () => {
   // Function to mark a plan as completed
   const handleMarkAsCompleted = async (planId) => {
     try {
-      await API.put(`/plans/complete/${planId}`)
-      fetchPlans() // Refresh plans
-      fetchStats() // Refresh stats after completion
+      console.log('Marking plan as completed:', planId)
+      dispatch(updatePlanStart())
+      const response = await API.put(`/plans/complete/${planId}`)
+      console.log('Response:', response.data)
+      
+      // Update the plan in Redux state
+      dispatch(updatePlanSuccess(response.data.plan))
+      
+      // Show confetti celebration
+      showConfetti()
+      
+      // Refresh stats after completion
+      fetchStats()
+      
       toast.success("🎉 Congratulations! You've completed your yoga plan. Namaste! 🙏", {
         autoClose: 5000,
       })
     } catch (err) {
-      // console.error("Error marking plan as completed:", err)
+      console.error("Error marking plan as completed:", err)
+      console.error("Error response:", err.response?.data)
       const errorMessage = err.response?.data?.message || "Failed to mark plan as completed"
+      dispatch(updatePlanFail(errorMessage))
       toast.error(errorMessage)
     }
+  }
+
+  // Confetti celebration effect
+  const showConfetti = () => {
+    const duration = 3000
+    const animationEnd = Date.now() + duration
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min
+    }
+
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now()
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval)
+      }
+
+      const particleCount = 50 * (timeLeft / duration)
+
+      // Create confetti particles
+      for (let i = 0; i < particleCount; i++) {
+        const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#14b8a6']
+        const particle = document.createElement('div')
+        particle.style.position = 'fixed'
+        particle.style.width = '10px'
+        particle.style.height = '10px'
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+        particle.style.left = randomInRange(0, window.innerWidth) + 'px'
+        particle.style.top = randomInRange(-100, 0) + 'px'
+        particle.style.opacity = '1'
+        particle.style.borderRadius = '50%'
+        particle.style.zIndex = '9999'
+        particle.style.pointerEvents = 'none'
+        particle.style.animation = `confettiFall ${randomInRange(2, 4)}s linear forwards`
+        
+        document.body.appendChild(particle)
+        
+        setTimeout(() => {
+          particle.remove()
+        }, 4000)
+      }
+    }, 250)
   }
 
   // Safe plan property access
@@ -412,6 +471,22 @@ const Dashboard = () => {
                   return null
                 }
 
+                // Define hover colors based on index
+                const hoverColors = [
+                  'hover:border-purple-500/50 hover:shadow-purple-500/20',
+                  'hover:border-blue-500/50 hover:shadow-blue-500/20',
+                  'hover:border-green-500/50 hover:shadow-green-500/20',
+                  'hover:border-pink-500/50 hover:shadow-pink-500/20',
+                  'hover:border-yellow-500/50 hover:shadow-yellow-500/20',
+                  'hover:border-cyan-500/50 hover:shadow-cyan-500/20',
+                ];
+                const hoverColor = hoverColors[index % hoverColors.length];
+
+                // Completed plan gets special green glow
+                const completedStyle = plan.completed 
+                  ? 'border-green-500/50 bg-green-900/10 shadow-lg shadow-green-500/20' 
+                  : '';
+
                 return (
                   <motion.div
                     key={plan._id}
@@ -419,8 +494,32 @@ const Dashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden hover:shadow-2xl hover:border-purple-500/30 transition-all duration-300 group"
+                    whileHover={{ scale: 1.03, y: -5 }}
+                    className={`bg-slate-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden transition-all duration-300 group ${hoverColor} ${completedStyle}`}
                   >
+                    {/* Completed Badge - Celebration Confetti Effect */}
+                    {plan.completed && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: "spring", duration: 0.5 }}
+                          className="relative"
+                        >
+                          <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                            <span>✨</span>
+                            <span>Completed!</span>
+                            <span>🎉</span>
+                          </div>
+                          <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute -inset-2 bg-green-500/20 rounded-full blur-md"
+                          />
+                        </motion.div>
+                      </div>
+                    )}
+
                     {/* Plan Header */}
                     <div className="p-6 border-b border-slate-700/50">
                       <div className="flex items-center justify-between mb-4">

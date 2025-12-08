@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPlanStart, createPlanSuccess, createPlanFail, clearPlanError } from '../features/plan/planSlice'
@@ -57,6 +57,7 @@ const CreatePlan = () => {
   const { loading, error } = useSelector((state) => state.plan)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const planCreatedRef = useRef(false)
 
   useEffect(() => {
     dispatch(clearPlanError())
@@ -68,6 +69,15 @@ const CreatePlan = () => {
       setFormData(prev => ({ ...prev, yogaType: location.state.preSelectedYogaType }))
     }
   }, [location.state])
+
+  // Navigate to dashboard when plan is successfully created
+  useEffect(() => {
+    if (planCreatedRef.current && !loading) {
+      console.log('Plan created and loading cleared - navigating to dashboard')
+      planCreatedRef.current = false
+      navigate('/dashboard', { replace: true })
+    }
+  }, [loading, navigate])
 
   const yogaTypes = [
     'Hatha', 'Vinyasa', 'Ashtanga', 'Iyengar', 'Bikram', 
@@ -91,6 +101,7 @@ const CreatePlan = () => {
     }
 
     try {
+      console.log('Creating plan with data:', formData)
       dispatch(createPlanStart())
       
       // Convert dailySchedule string to array for backend validation
@@ -99,13 +110,21 @@ const CreatePlan = () => {
         dailySchedule: formData.dailySchedule ? [formData.dailySchedule] : []
       }
 
+      console.log('Sending payload:', payload)
       const { data } = await API.post('/plans', payload)
+      console.log('Plan created:', data)
+      
       dispatch(createPlanSuccess(data.plan))
-      toast.success('🧘‍♀️ Plan created successfully! Email and SMS notifications sent.', {
-        autoClose: 5000,
+      toast.success('🧘‍♀️ Plan created successfully!', {
+        autoClose: 2000,
       })
-      setTimeout(() => navigate('/dashboard'), 1500)
+      
+      // Set flag to trigger navigation via useEffect
+      console.log('Setting planCreatedRef to true')
+      planCreatedRef.current = true
     } catch (err) {
+      console.error('Error creating plan:', err)
+      console.error('Error response:', err.response?.data)
       const errorMessage = err.response?.data?.message || 'Failed to create plan'
       dispatch(createPlanFail(errorMessage))
       toast.error(errorMessage)

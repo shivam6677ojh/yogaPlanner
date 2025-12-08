@@ -25,39 +25,37 @@ export const createPlan = async (req, res) => {
 
     await plan.save();
 
-    // ✅ Send Email (make sure req.user.email and req.user.name exist)
-    if (req.user.email) {
-      try {
-        await sendEmail(
-          req.user.email,
-          "🧘 Yoga Plan Created Successfully",
-          `Hi ${req.user.name || "User"},\n\nYour yoga plan "${
-            plan.planName
-          }" has been created successfully!\nKeep practicing and stay consistent.\n\n- Yoga Planner App`
-        );
-      } catch (emailError) {
-        console.error("Failed to send plan creation email:", emailError);
-      }
-    }
-
-    // ✅ Send SMS (make sure req.user.phone exists)
-    if (req.user.phone) {
-      try {
-        await sendSMS(
-          req.user.phone,
-          `Hi ${req.user.name || "User"}, your yoga plan "${
-            plan.planName
-          }" is ready! Stay consistent 🧘‍♂️`
-        );
-      } catch (smsError) {
-        console.error("Failed to send plan creation SMS:", smsError);
-      }
-    }
-
+    // Respond immediately to user
     res.status(201).json({
       message: "Plan created successfully",
       plan,
     });
+
+    // Send notifications asynchronously (non-blocking)
+    // ✅ Send Email in background
+    if (req.user.email) {
+      sendEmail(
+        req.user.email,
+        "🧘 Yoga Plan Created Successfully",
+        `Hi ${req.user.name || "User"},\n\nYour yoga plan "${
+          plan.planName
+        }" has been created successfully!\nKeep practicing and stay consistent.\n\n- Yoga Planner App`
+      ).catch(emailError => {
+        console.error("Failed to send plan creation email:", emailError);
+      });
+    }
+
+    // ✅ Send SMS in background
+    if (req.user.phone) {
+      sendSMS(
+        req.user.phone,
+        `Hi ${req.user.name || "User"}, your yoga plan "${
+          plan.planName
+        }" is ready! Stay consistent 🧘‍♂️`
+      ).catch(smsError => {
+        console.error("Failed to send plan creation SMS:", smsError);
+      });
+    }
   } catch (err) {
     console.error("❌ Error creating plan:", err);
     res
@@ -129,22 +127,21 @@ export const markPlanCompleted = async (req, res) => {
     plan.completed = true;
     await plan.save();
 
-    // sending mail notification for completion
-    if (req.user.email) {
-      try {
-        await sendEmail(
-          req.user.email,
-          "🎉 Yoga Plan Completed",
-          `Hi ${req.user.name || "User"},\n\nCongratulations! You have completed your yoga plan "${
-            plan.planName
-          }"!\n\nKeep up the great work and stay consistent.\n\n- Yoga Planner App`
-        );
-      } catch (emailError) {
-        console.error("Failed to send completion email:", emailError);
-      }
-    }
-
+    // Respond immediately
     res.json({ message: "Plan marked as completed", plan });
+
+    // Send completion email in background (non-blocking)
+    if (req.user.email) {
+      sendEmail(
+        req.user.email,
+        "🎉 Yoga Plan Completed",
+        `Hi ${req.user.name || "User"},\n\nCongratulations! You have completed your yoga plan "${
+          plan.planName
+        }"!\n\nKeep up the great work and stay consistent.\n\n- Yoga Planner App`
+      ).catch(emailError => {
+        console.error("Failed to send completion email:", emailError);
+      });
+    }
   } catch (err) {
     console.error("❌ Error marking plan as completed:", err);
     res

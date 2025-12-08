@@ -33,7 +33,7 @@ const planSlice = createSlice({
     },
     createPlanSuccess: (state, action) => {
       state.loading = false
-      state.plans.push(action.payload)
+      state.plans.unshift(action.payload) // Add to beginning
     },
     createPlanFail: (state, action) => {
       state.loading = false
@@ -48,6 +48,21 @@ const planSlice = createSlice({
       state.plans = state.plans.filter((plan) => plan._id !== action.payload)
     },
     deletePlanFail: (state, action) => {
+      state.loading = false
+      state.error = action.payload
+    },
+    updatePlanStart: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    updatePlanSuccess: (state, action) => {
+      state.loading = false
+      const index = state.plans.findIndex(plan => plan._id === action.payload._id)
+      if (index !== -1) {
+        state.plans[index] = action.payload
+      }
+    },
+    updatePlanFail: (state, action) => {
       state.loading = false
       state.error = action.payload
     },
@@ -79,6 +94,9 @@ export const {
   deletePlanStart,
   deletePlanSuccess,
   deletePlanFail,
+  updatePlanStart,
+  updatePlanSuccess,
+  updatePlanFail,
   fetchStatsStart,
   fetchStatsSuccess,
   fetchStatsFail,
