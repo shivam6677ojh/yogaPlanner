@@ -104,17 +104,10 @@ const Register = () => {
       return
     }
 
-    // Validate email format
+    // Basic email format validation
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address')
-      return
-    }
-
-    // Check for common fake email patterns
-    const fakeEmailPatterns = /^(test|fake|dummy|sample|example|temp|trash|disposable).*@/i
-    if (fakeEmailPatterns.test(formData.email)) {
-      toast.error('Please use a real email address')
+      toast.error('Please enter a valid email format')
       return
     }
 
@@ -159,31 +152,13 @@ const Register = () => {
         cleanedData.age = parseInt(formData.age)
       }
       
-      const { data } = await API.post('/users/register', cleanedData)
+      await API.post('/users/register', cleanedData)
       
-      // Check if email verification was skipped
-      if (data.skipVerification) {
-        // Save token and user data
-        if (data.token) {
-          localStorage.setItem('token', data.token)
-        }
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user))
-        }
-        
-        dispatch(registerSuccess())
-        toast.success('Registration successful! Redirecting to dashboard...')
-        
-        // Navigate to dashboard directly
-        setTimeout(() => navigate('/dashboard'), 1000)
-      } else {
-        // Regular flow - need OTP verification
-        dispatch(registerSuccess())
-        toast.success('Registration successful! Please check your email for OTP.')
-        
-        // Navigate to OTP verification page
-        setTimeout(() => navigate('/verify-otp', { state: { email: cleanedData.email } }), 1500)
-      }
+      dispatch(registerSuccess())
+      toast.success('Registration successful! Please login with your credentials.')
+      
+      // Navigate to login page
+      setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
       console.error('Registration error:', err)
       console.error('Error response:', err.response?.data)

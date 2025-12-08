@@ -53,21 +53,10 @@ const userSchema = new mongoose.Schema({
     maxlength: [200, 'Goal cannot exceed 200 characters']
   },
 
-  // Email verification fields
+  // Email verification
   isVerified: {
     type: Boolean,
-    default: false
-  },
-  
-  verificationToken: String,
-  verificationTokenExpire: Date,
-
-  // OTP verification fields
-  otp: String,
-  otpExpire: Date,
-  otpAttempts: {
-    type: Number,
-    default: 0
+    default: true
   },
 
   // Password reset fields

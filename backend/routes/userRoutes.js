@@ -4,10 +4,6 @@ import {
   loginUser, 
   logoutUser,
   updateProfile,
-  verifyEmail,
-  resendVerificationEmail,
-  verifyOTP,
-  resendOTP,
   forgotPassword,
   resetPassword
 } from "../controllers/userController.js";
@@ -30,13 +26,7 @@ const router = express.Router();
 // Public routes with rate limiting
 router.post("/register", authLimiter, validateRegister, registerUser);
 router.post("/login", authLimiter, validateLogin, loginUser);
-router.post("/verify-otp", emailVerificationLimiter, verifyOTP);
-router.post("/resend-otp", emailVerificationLimiter, resendOTP);
 router.post("/logout", logoutUser);
-
-// Email verification routes
-router.get("/verify-email/:token", verifyEmail);
-router.post("/resend-verification", emailVerificationLimiter, validateEmail, resendVerificationEmail);
 
 // Password reset routes
 router.post("/forgot-password", passwordResetLimiter, validateEmail, forgotPassword);

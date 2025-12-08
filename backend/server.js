@@ -79,5 +79,4 @@ app.listen(PORT, async () => {
   await connectDB();
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   console.log(`📦 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`⚡ Email verification: ${process.env.SKIP_EMAIL_VERIFICATION === 'true' ? 'SKIPPED' : 'ENABLED'}`);
 });

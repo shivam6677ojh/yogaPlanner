@@ -10,7 +10,6 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import YogaVideos from "./pages/YogaVideos";
 import YogaTypes from "./pages/YogaTypes";
-import VerifyOTP from "./pages/VerifyOTP";
 import GlobalChatbot from "./components/GlobalChatbot";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -37,7 +36,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route
             path="/dashboard"
             element={
