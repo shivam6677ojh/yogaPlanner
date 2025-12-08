@@ -176,7 +176,7 @@ const Register = () => {
       toast.success('Registration successful! Redirecting to login...')
       
       // Navigate to login page immediately
-      setTimeout(() => navigate('/login'), 1000)
+      setTimeout(() => navigate('/'), 1000)
     } catch (err) {
       console.error('Registration error:', err)
       console.error('Error response:', err.response?.data)
